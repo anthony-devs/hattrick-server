@@ -10,6 +10,7 @@ from datetime import timedelta
 import datetime
 import requests
 import uuid
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # Set the database URI
@@ -449,7 +450,7 @@ def check_new_month():
     else:
         return False
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000), debug=True)
     if check_new_month:
         top_user = User.query.order_by(User.super_points.desc()).limit(5).all()
         # Create a list of user information to return
