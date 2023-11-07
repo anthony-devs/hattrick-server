@@ -10,6 +10,7 @@ from datetime import timedelta
 import datetime
 import requests
 import uuid
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # Set the database URI
