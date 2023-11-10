@@ -449,5 +449,6 @@ if __name__ == '__main__':
     if check_new_month:
         top_user = User.query.order_by(User.super_points.desc()).limit(5).all()
         # Create a list of user information to return
-        top_user.earning_balance += 50
+        top_user.earning_balance += 10000000
+        
         
