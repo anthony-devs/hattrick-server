@@ -120,13 +120,6 @@ def Register():
             year=str(datetime.datetime.now().year)
         )
 
-        if data['ref_id']:
-            referer = User.query.filter_by(username=data['ref_id']).first()
-            referer.earning_balance += 800
-            db.session.commit()
-        else:
-            print(f'''The User: '{data["email"]}' Has No Refferer ''')
-
         db.session.add(new_user)
         db.session.commit()
         return {'username': new_user.username}, 200
