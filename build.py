@@ -124,6 +124,8 @@ def Register():
             referer = User.query.filter_by(username=data['ref_id']).first()
             referer.earning_balance += 800
             db.session.commit()
+        else:
+            print(f'''The User: '{data["email"]}' Has No Refferer ''')
 
         db.session.add(new_user)
         db.session.commit()
