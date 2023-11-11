@@ -1,10 +1,7 @@
-from flask import Flask, render_template, url_for, redirect, request, jsonify
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+from flask_login import UserMixin, LoginManager, login_required
 from flask_cors import CORS, cross_origin
 from datetime import timedelta
 import datetime
@@ -13,11 +10,13 @@ import uuid
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:d55Hh6--GgH5caC6abA316Gh-cfE-C6H@mysql.railway.internal:3306/railway'  # Set the database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:d55Hh6--GgH5caC6abA316Gh-cfE-C6H@mysql.railway.internal:3306/railway'
 app.config['SECRET_KEY'] = 'hattrick'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)  # Set session duration to 1 year
-app.config['SESSION_PERMANENT'] = True  # Make sessions permanent
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
+app.config['SESSION_PERMANENT'] = True
 app.permanent_session_lifetime = timedelta(days=365)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Suppress a warning
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 CORS(app)
