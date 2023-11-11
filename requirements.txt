@@ -6,4 +6,3 @@ wtforms
 flask_bcrypt
 flask_cors
 requests
-mysqlclient
