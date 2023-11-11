@@ -10,7 +10,7 @@ import uuid
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:d55Hh6--GgH5caC6abA316Gh-cfE-C6H@mysql.railway.internal:3306/railway'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://database.db'
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
