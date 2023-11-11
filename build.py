@@ -10,7 +10,7 @@ import uuid
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite3-production-ad93.up.railway.app/seed_db.sql'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite3-production-ad93.up.railway.app/data/database.db'
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
