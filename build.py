@@ -13,10 +13,14 @@ import uuid
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # Set the database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:d55Hh6--GgH5caC6abA316Gh-cfE-C6H@mysql.railway.internal:3306/railway'  # Set the database URI
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)  # Set session duration to 1 year
 app.config['SESSION_PERMANENT'] = True  # Make sessions permanent
+app.config['MYSQL_HOST'] = 'monorail.proxy.rlwy.net'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'd55Hh6--GgH5caC6abA316Gh-cfE-C6H'
+app.config['MYSQL_DB'] = 'railway'
 app.permanent_session_lifetime = timedelta(days=365)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
