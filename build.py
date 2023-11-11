@@ -10,7 +10,7 @@ import uuid
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:--DE43f2B6eAeDA*B*GD2-bB1-Dfga6e@monorail.proxy.rlwy.net:17170/railway'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
