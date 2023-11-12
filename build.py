@@ -30,7 +30,7 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
+scheduler = BackgroundScheduler()
 with app.app_context():
     db.create_all()
 class User(db.Model, UserMixin):
