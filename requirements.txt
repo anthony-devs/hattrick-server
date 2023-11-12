@@ -6,4 +6,4 @@ wtforms
 flask_bcrypt
 flask_cors
 requests
-mysqlclient
+psycopg2-binary
