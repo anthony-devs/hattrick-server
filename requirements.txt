@@ -6,5 +6,3 @@ wtforms
 flask_bcrypt
 flask_cors
 requests
-flask_mysqldb
-pymysql
