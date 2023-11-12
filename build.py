@@ -12,7 +12,7 @@ import os
 #import psycopg2
 print('starting...')
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', default="mysql://root:FbFg1adD1-C6fDhD31d42H1A-Hc6A-Cf@roundhouse.proxy.rlwy.net:50467/railway")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
