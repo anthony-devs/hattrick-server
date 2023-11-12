@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin, LoginManager, login_required
@@ -8,6 +8,10 @@ import datetime
 import requests
 import uuid
 import os
+import json
+from openpyxl import load_workbook
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 #import psycopg2
 print('starting...')
@@ -53,6 +57,7 @@ class EasyQuestion(db.Model):
     opt2 = db.Column(db.String(10000000), nullable=True)
     opt3 = db.Column(db.String(10000000), nullable=True)
     question = db.Column(db.String(10000000), nullable=True)
+    uploaded = db.Column(db.String(10000000), nullable=True)
 
     @property
     def serialize(self):
@@ -72,6 +77,7 @@ class HardQuestion(db.Model):
     opt2 = db.Column(db.String(10000000), nullable=True)
     opt3 = db.Column(db.String(10000000), nullable=True)
     question = db.Column(db.String(10000000), nullable=True)
+    uploaded = db.Column(db.String(10000000), nullable=True)
 
     @property
     def serialize(self):
@@ -213,7 +219,7 @@ def index():
 @app.route('/upload-easy', methods=["POST"])
 def uploadEasy():
     data = request.get_json()
-    new = EasyQuestion(correct_answer=data['correctAnswer'], opt1=data['opt1'], opt2=data['opt2'], opt3=data['opt3'], question=data['question'])
+    new = EasyQuestion(correct_answer=data['correctAnswer'], opt1=data['opt1'], opt2=data['opt2'], opt3=data['opt3'], question=data['question'], uploaded=str(datetime.now().strftime('%d-%m-%Y')))
 
     db.session.add(new)
     db.session.commit()
@@ -222,7 +228,7 @@ def uploadEasy():
 @app.route('/upload-hard', methods=["POST"])
 def uploadHard():
     data = request.get_json()
-    new = HardQuestion(correct_answer=data['correctAnswer'], opt1=data['opt1'], opt2=data['opt2'], opt3=data['opt3'], question=data['question'])
+    new = HardQuestion(correct_answer=data['correctAnswer'], opt1=data['opt1'], opt2=data['opt2'], opt3=data['opt3'], question=data['question'], uploaded=str(datetime.now().strftime('%d-%m-%Y')))
     db.session.add(new)
     db.session.commit()
     return 'Success', 200
@@ -449,11 +455,117 @@ def check_new_month():
         return True
     else:
         return False
+
+
+
+@app.route('/upload')
+def Upload():
+    return render_template('upload_quiz.html')
+
+
+@app.route("/clear-quiz")
+def DeleteQuiz():
+    db.session.query(EasyQuestion).delete()
+    db.session.query(HardQuestion).delete()
+
+    # Commit the changes to the database
+    db.session.commit()
+
+
+@app.route('/upload-questions', methods=['POST'])
+def upload_questions():
+    try:
+        file = request.files['file']
+        data = json.loads(request.form['data'])
+
+        # Process the uploaded Excel file
+        excel_data = data['excelData']
+        for table in excel_data.keys():
+            rows = excel_data[table]['rows']
+
+            for i in range(1, len(rows)):
+                row = rows[i]
+
+                question = row[0]
+                correct_answer = row[1]
+                options = row[2:5]
+                difficulty = row[5]
+                duration = 12
+                points = 4
+
+                # Check the difficulty level and upload to the appropriate collection
+                collection_name = 'easy_questions' if difficulty == 'easy' else 'hard_questions'
+
+                # Make a request to the server
+                response = make_request(question, correct_answer, options, duration, points, difficulty, collection_name)
+                print(response.json())
+
+        return jsonify({'message': 'Questions uploaded successfully'}), 200
+
+    except Exception as e:
+        response = {'error': str(e)}
+        return jsonify(response), 500
+
+def make_request(question, correct_answer, options, duration, points, difficulty, collection_name):
+    url = f"https://hattrick-server-production.up.railway.app/upload-{difficulty}"
+    data = {
+        'question': question,
+        'correctAnswer': correct_answer,
+        'opt1': options[0],
+        'opt2': options[1],
+        'opt3': options[2],
+        'duration': str(duration),
+        'points': str(points)
+    }
+    headers = {'Content-Type': 'application/json; charset=UTF-8'}
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    return response
+
+
+
+@scheduler.scheduled_job('interval', days=7)  # Adjust the interval as needed
+def delete_old_questions():
+    one_week_ago = datetime.now() - timedelta(days=7)
+    
+    # Delete questions uploaded exactly one week ago
+    EasyQuestion.query.filter(EasyQuestion.uploaded <= one_week_ago).delete()
+    HardQuestion.query.filter(HardQuestion.uploaded <= one_week_ago).delete()
+
+    # Commit the changes to the database
+    db.session.commit()
+
+
+trigger = CronTrigger(day_of_month='1')  # This will run the job on the 1st day of every month
+
+# Schedule the job with the cron trigger
+@scheduler.scheduled_job(trigger)
+def credit_top_users():
+    # Your existing code for crediting top users
+    one_week_ago = datetime.now() - timedelta(days=7)
+
+    # Retrieve the top 5 users with the highest super points
+    top_users = User.query.order_by(User.super_points.desc()).limit(5).all()
+
+    # Credit the top user with 1 million
+    if top_users:
+        top_users[0].earning_balance += 1000000
+
+        # Credit the other 4 users with 50000 each
+        for user in top_users[1:]:
+            user.earning_balance += 50000
+
+        # Commit the changes to the database
+        db.session.commit()
+
+# Start the scheduler when the Flask app starts
+scheduler.start()
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
-    if check_new_month:
-        top_user = User.query.order_by(User.super_points.desc()).limit(5).all()
-        # Create a list of user information to return
-        top_user.earning_balance += 10000000
-        
-        

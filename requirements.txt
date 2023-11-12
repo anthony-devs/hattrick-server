@@ -7,3 +7,6 @@ flask_bcrypt
 flask_cors
 requests
 psycopg2-binary
+pandas
+openpyxl
+apscheduler
