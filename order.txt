@@ -1,0 +1,4 @@
+(id, city, password, full_name, username, email, earning_balance, coins, practice_points, is_subscribed, super_points, day, month, year, games_played)
+(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+
+(new_user_id, data['city'], hashed_password, data['FullName'], data['email'], data['username'], 0, 15, 0, 0, 0, 0, str(datetime.datetime.now().day), str(datetime.datetime.now().month), str(datetime.datetime.now().year))

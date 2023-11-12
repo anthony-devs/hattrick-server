@@ -8,15 +8,17 @@ import datetime
 import requests
 import uuid
 import os
+from pymongo import MongoClient
 #import psycopg2
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', default="mysql://root:FbFg1adD1-C6fDhD31d42H1A-Hc6A-Cf@roundhouse.proxy.rlwy.net:50467/railway")
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
 app.permanent_session_lifetime = timedelta(days=365)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Suppress a warning
 
+#client = MongoClient("mongodb://mongo:CE5Bf1AcB5c12HgBFB3Ff-aFAdEd-bgf@roundhouse.proxy.rlwy.net:44834")
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 CORS(app)
@@ -122,6 +124,7 @@ def Register():
         db.session.add(new_user)
         db.session.commit()
         return {'username': new_user.username}, 200
+
 
 
 @app.route('/delete', methods=['POST'])
