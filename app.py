@@ -25,6 +25,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+
+with app.app_context():
+    db.create_all()
 class User(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True, unique=True)
     city = db.Column(db.String(2000), nullable=False)
@@ -451,6 +454,7 @@ def check_new_month():
         return False
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000), debug=True)
+
     if check_new_month:
         top_user = User.query.order_by(User.super_points.desc()).limit(5).all()
         # Create a list of user information to return
