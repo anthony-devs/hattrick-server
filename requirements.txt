@@ -8,3 +8,4 @@ flask_cors
 requests
 flask_mysqldb
 pymysql
+mysqlclient==2.0.3
