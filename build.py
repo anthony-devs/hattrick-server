@@ -535,7 +535,7 @@ def delete_old_questions():
     db.session.commit()
 
 
-trigger = CronTrigger(day_of_month='1')  # This will run the job on the 1st day of every month
+trigger = CronTrigger(day='1')  # This will run the job on the 1st day of every month
 
 # Schedule the job with the cron trigger
 @scheduler.scheduled_job(trigger)
