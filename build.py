@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import UserMixin, LoginManager, login_required
 from flask_cors import CORS, cross_origin
 from datetime import timedelta
-import datetime
+from datetime import datetime
 import requests
 import uuid
 import os
