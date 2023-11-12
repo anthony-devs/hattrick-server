@@ -460,7 +460,7 @@ def check_new_month():
 
 @app.route('/upload')
 def Upload():
-    return render_template('upload_quiz.html')
+    return render_template('upload_quiz.html'), 200
 
 
 @app.route("/clear-quiz")
@@ -470,6 +470,7 @@ def DeleteQuiz():
 
     # Commit the changes to the database
     db.session.commit()
+    return "Cleared", 200
 
 
 @app.route('/upload-questions', methods=['POST'])
