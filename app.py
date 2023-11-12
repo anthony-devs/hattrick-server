@@ -26,8 +26,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
-with app.app_context():
-    db.create_all()
+
 class User(db.Model, UserMixin):
     id = db.Column(db.String(36), primary_key=True, unique=True)
     city = db.Column(db.String(2000), nullable=False)
