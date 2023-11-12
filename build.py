@@ -460,7 +460,7 @@ def check_new_month():
 
 @app.route('/upload')
 def Upload():
-    return render_template('quiz_upload.html'), 200
+    return render_template('quiz_upload.html')
 
 
 @app.route("/clear-quiz")
