@@ -49,9 +49,9 @@ class User(db.Model, UserMixin):
 class EasyQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     correct_answer = db.Column(db.String(10000000), nullable=True)
-    Opt1 = db.Column(db.String(10000000), nullable=True)
-    Opt2 = db.Column(db.String(10000000), nullable=True)
-    Opt3 = db.Column(db.String(10000000), nullable=True)
+    opt1 = db.Column(db.String(10000000), nullable=True)
+    opt2 = db.Column(db.String(10000000), nullable=True)
+    opt3 = db.Column(db.String(10000000), nullable=True)
     question = db.Column(db.String(10000000), nullable=True)
 
     @property
@@ -59,18 +59,18 @@ class EasyQuestion(db.Model):
         return {
             'id': self.id,
             'correct_answer': self.correct_answer,
-            'Opt1': self.Opt1,
-            'Opt2': self.Opt2,
-            'Opt3': self.Opt3,
+            'opt1': self.opt1,
+            'opt2': self.opt2,
+            'opt3': self.opt3,
             'question': self.question
         }
 
 class HardQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     correct_answer = db.Column(db.String(10000000), nullable=True)
-    Opt1 = db.Column(db.String(10000000), nullable=True)
-    Opt2 = db.Column(db.String(10000000), nullable=True)
-    Opt3 = db.Column(db.String(10000000), nullable=True)
+    opt1 = db.Column(db.String(10000000), nullable=True)
+    opt2 = db.Column(db.String(10000000), nullable=True)
+    opt3 = db.Column(db.String(10000000), nullable=True)
     question = db.Column(db.String(10000000), nullable=True)
 
     @property
@@ -78,9 +78,9 @@ class HardQuestion(db.Model):
         return {
             'id': self.id,
             'correct_answer': self.correct_answer,
-            'Opt1': self.Opt1,
-            'Opt2': self.Opt2,
-            'Opt3': self.Opt3,
+            'opt1': self.opt1,
+            'opt2': self.opt2,
+            'opt3': self.opt3,
             'question': self.question
         }
 
@@ -213,7 +213,7 @@ def index():
 @app.route('/upload-easy', methods=["POST"])
 def uploadEasy():
     data = request.get_json()
-    new = EasyQuestion(correct_answer=data['correctAnswer'], Opt1=data['opt1'], Opt2=data['opt2'], Opt3=data['opt3'], question=data['question'])
+    new = EasyQuestion(correct_answer=data['correctAnswer'], opt1=data['opt1'], opt2=data['opt2'], opt3=data['opt3'], question=data['question'])
 
     db.session.add(new)
     db.session.commit()
@@ -222,7 +222,7 @@ def uploadEasy():
 @app.route('/upload-hard', methods=["POST"])
 def uploadHard():
     data = request.get_json()
-    new = HardQuestion(correct_answer=data['correctAnswer'], Opt1=data['opt1'], Opt2=data['opt2'], Opt3=data['opt3'], question=data['question'])
+    new = HardQuestion(correct_answer=data['correctAnswer'], opt1=data['opt1'], opt2=data['opt2'], opt3=data['opt3'], question=data['question'])
     db.session.add(new)
     db.session.commit()
     return 'Success', 200
