@@ -64,9 +64,9 @@ class EasyQuestion(db.Model):
         return {
             'id': self.id,
             'correct_answer': self.correct_answer,
-            'opt1': self.opt1,
-            'opt2': self.opt2,
-            'opt3': self.opt3,
+            'Opt1': self.opt1,
+            'Opt2': self.opt2,
+            'Opt3': self.opt3,
             'question': self.question
         }
 
@@ -84,9 +84,9 @@ class HardQuestion(db.Model):
         return {
             'id': self.id,
             'correct_answer': self.correct_answer,
-            'opt1': self.opt1,
-            'opt2': self.opt2,
-            'opt3': self.opt3,
+            'Opt1': self.opt1,
+            'Opt2': self.opt2,
+            'Opt3': self.opt3,
             'question': self.question
         }
 
