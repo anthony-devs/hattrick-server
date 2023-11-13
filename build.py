@@ -125,9 +125,9 @@ def Register():
             is_subscribed=False,
             super_points=0,
             games_played = 0,
-            day=str(datetime.datetime.now().day),
-            month=str(datetime.datetime.now().month),
-            year=str(datetime.datetime.now().year)
+            day=str(datetime.now().day),
+            month=str(datetime.now().month),
+            year=str(datetime.now().year)
         )
 
         db.session.add(new_user)
@@ -448,9 +448,9 @@ def check_new_month():
     global previous_month
 
     # Get the current month
-    current_month = datetime.datetime.now().month
+    current_month = datetime.now().month
 
-    if datetime.datetime.now().day == 1:
+    if datetime.now().day == 1:
         previous_month = current_month
         return True
     else:
