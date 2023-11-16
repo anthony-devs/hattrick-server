@@ -50,6 +50,21 @@ class User(db.Model, UserMixin):
     year = db.Column(db.String(150), nullable=False)
     games_played = db.Column(db.Integer, nullable=True)
 
+class News(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    text = db.Column(db.String(10000000), nullable=True)
+    category = db.Column(db.String(10000000), nullable=True)
+    date = db.Column(db.String(10000000), nullable=True)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'text': self.text,
+            'category': self.category,
+            'date': self.date
+        }
+
 class EasyQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     correct_answer = db.Column(db.String(10000000), nullable=True)
@@ -561,6 +576,11 @@ def credit_top_users():
 # Start the scheduler when the Flask app starts
 scheduler.start()
 
+
+@app.route('/news')
+def GetNews():
+    news = News.query.all()
+    return jsonify([news.serialize for news in news]), 200
 
 
 
