@@ -587,12 +587,12 @@ def GetNews():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
     while True:
-        if (datetime.now().day == 1):
+        if (datetime.now().day == 1 and datetime.now().hour == 0 and datetime.now().minute == 0 and datetime.now().second == 0):
             delete_old_questions()
             credit_top_users()
-        elif (datetime.now().hour == 0):
+        elif (datetime.now().hour == 0 and datetime.now().minute == 0 and datetime.now().second == 0):
             all_users = User.query.order_by(User.super_points.desc()).all()
             for user in all_users[1:]:
                 user.earning_balance += 3
-            db.session.commit()
+                db.session.commit()
 
