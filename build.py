@@ -538,8 +538,7 @@ def make_request(question, correct_answer, options, duration, points, difficulty
     return response
 
 
-
-@scheduler.scheduled_job('interval', days=7)  # Adjust the interval as needed
+ # Adjust the interval as needed
 def delete_old_questions():
     one_week_ago = datetime.now() - timedelta(days=7)
     
@@ -553,8 +552,7 @@ def delete_old_questions():
 
 trigger = CronTrigger(day='1')  # This will run the job on the 1st day of every month
 
-# Schedule the job with the cron trigger
-@scheduler.scheduled_job(trigger)
+
 def credit_top_users():
     # Your existing code for crediting top users
     one_week_ago = datetime.now() - timedelta(days=7)
@@ -573,8 +571,6 @@ def credit_top_users():
         # Commit the changes to the database
         db.session.commit()
 
-# Start the scheduler when the Flask app starts
-scheduler.start()
 
 
 @app.route('/news')
@@ -590,3 +586,13 @@ def GetNews():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
+    while True:
+        if (datetime.now().day == 1):
+            delete_old_questions()
+            credit_top_users()
+        elif (datetime.now().hour == 0):
+            all_users = User.query.order_by(User.super_points.desc()).all()
+            for user in all_users[1:]:
+                user.earning_balance += 3
+            db.session.commit()
+
