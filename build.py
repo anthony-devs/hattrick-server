@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import JSON
 #import psycopg2
 print('starting...')
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', default="postgres://postgres:*5*Ed6e1*BedaC1a*5dAfGBd1GDFf-E4@viaduct.proxy.rlwy.net:33520/railway")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
