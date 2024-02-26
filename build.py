@@ -66,7 +66,7 @@ class News(db.Model):
             'category': self.category,
             'date': self.date
         }
-class Super_League(db.Model):
+class SuperLeague(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     players = db.Column(JSON, default=lambda: [])
     prize1 = db.Column(db.Integer) #Prize for the top 1
@@ -412,7 +412,7 @@ def getBoard():
 
 @app.route("/get-leagues", methods=['GET'])
 def getLeagues():
-    leagues = Super_League.query.order_by(Super_League.id.desc()).limit(100).all()
+    leagues = SuperLeague.query.order_by(SuperLeague.id.desc()).limit(100).all()
 
     # Create a list of user information to return
     
@@ -438,7 +438,7 @@ def JoinLeague():
 
     # Fetch the user and league from the database
     user = User.query.filter_by(id=data["uid"]).first()
-    league = Super_League.query.filter_by(id=data["id"]).first()
+    league = SuperLeague.query.filter_by(id=data["id"]).first()
 
     # Check if user and league exist
     if not user:
