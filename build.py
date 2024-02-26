@@ -12,11 +12,11 @@ import json
 from openpyxl import load_workbook
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-
+from sqlalchemy.dialects.postgresql import JSON
 #import psycopg2
 print('starting...')
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', default="postgres://postgres:*5*Ed6e1*BedaC1a*5dAfGBd1GDFf-E4@viaduct.proxy.rlwy.net:33520/railway")
 app.config['SECRET_KEY'] = 'hattrick'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 app.config['SESSION_PERMANENT'] = True
@@ -40,7 +40,7 @@ class User(db.Model, UserMixin):
     full_name = db.Column(db.String(5000), nullable=False)
     username = db.Column(db.String(600), nullable=False, unique=True)
     email = db.Column(db.String(8000), nullable=False, unique=True)
-    earning_balance = db.Column(db.Integer, nullable=True)
+    earning_balance = db.Column(db.Float, nullable=True)
     coins = db.Column(db.Integer, nullable=True)
     practice_points = db.Column(db.Integer, nullable=True)
     is_subscribed = db.Column(db.Boolean, nullable=True)
@@ -49,6 +49,8 @@ class User(db.Model, UserMixin):
     month = db.Column(db.String(150), nullable=False)
     year = db.Column(db.String(150), nullable=False)
     games_played = db.Column(db.Integer, nullable=True)
+    hattricks = db.Column(db.Integer, nullable=True)
+    league_timeout = db.Column(db.Integer, nullable=True)
 
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
@@ -64,7 +66,27 @@ class News(db.Model):
             'category': self.category,
             'date': self.date
         }
-
+class Super_League(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    players = db.Column(JSON, default=lambda: [])
+    prize1 = db.Column(db.Integer) #Prize for the top 1
+    prize2 = db.Column(db.Integer) #Prize for the top 10
+    prize3 = db.Column(db.Integer) #Coins for the top 20
+    duration = db.Column(db.Integer) #Days
+    sweep_off = db.Column(db.Integer) #Interval before sweep off
+    start_date = db.Column(db.String)
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'players': self.players,
+            'prize1': self.prize1,
+            'prize2': self.prize2,
+            'prize3': self.prize3,
+            'duration': self.duration,
+            'sweep_off': self.sweep_off
+            
+        }
 class EasyQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     correct_answer = db.Column(db.String(10000000), nullable=True)
@@ -142,7 +164,9 @@ def Register():
             games_played = 0,
             day=str(datetime.now().day),
             month=str(datetime.now().month),
-            year=str(datetime.now().year)
+            year=str(datetime.now().year),
+            hattricks=0,
+            league_timeout = 0
         )
 
         db.session.add(new_user)
@@ -179,6 +203,8 @@ def Login():
                 print(user.email)
                 return jsonify({
                     'uid':user.id,
+                    'hattricks' : user.hattricks,
+                    'league_timeout' : user.league_timeout,
                     'username': user.username,
                     'FullName': user.full_name,
                     'city': user.city,
@@ -189,6 +215,8 @@ def Login():
                     'practice_points':user.practice_points,
                     'super_points':user.super_points,
                     'played' : user.games_played,
+                    
+                    
                 }), 200
                 
             else:
@@ -212,6 +240,8 @@ def AuthUser():
     if user:
         return jsonify({
             'uid':user.id,
+            'hattricks' : user.hattricks,
+            'league_timeout' : user.league_timeout,
             'username': user.username,
             'FullName': user.full_name,
             'city': user.city,
@@ -289,6 +319,8 @@ def PostPracticeGame():
             db.session.commit()  # Commit the changes to the database
             return jsonify({
             'uid':user.id,
+            'hattricks' : user.hattricks,
+            'league_timeout' : user.league_timeout,
             'username': user.username,
             'FullName': user.full_name,
             'city': user.city,
@@ -318,6 +350,8 @@ def PostPracticeGame():
             if int(data['score']) < 9 :
                 return jsonify({
                 'uid':user.id,
+                'hattricks' : user.hattricks,
+                'league_timeout' : user.league_timeout,
                 'username': user.username,
                 'FullName': user.full_name,
                 'city': user.city,
@@ -332,6 +366,8 @@ def PostPracticeGame():
             else:
                 return jsonify({
                 'uid':user.id,
+                'hattricks' : user.hattricks,
+                'league_timeout' : user.league_timeout,
                 'username': user.username,
                 'FullName': user.full_name,
                 'city': user.city,
@@ -358,7 +394,7 @@ def get_country_flag(country_name):
 @app.route("/get-board", methods=['GET'])
 def getBoard():
     # Retrieve the top 30 users with the highest super points
-    top_users = User.query.order_by(User.super_points.desc()).limit(100).all()
+    top_users = User.query.order_by(User.practice_points.desc()).limit(100).all()
 
     # Create a list of user information to return
     
@@ -372,6 +408,54 @@ def getBoard():
     ]
 
     return jsonify(leaderboard), 200
+
+
+@app.route("/get-leagues", methods=['GET'])
+def getLeagues():
+    leagues = Super_League.query.order_by(Super_League.id.desc()).limit(100).all()
+
+    # Create a list of user information to return
+    
+    league_board = [
+        {
+            'id': league.id,
+            'ends': str(datetime.strptime(league.start_date, "%d/%m/%Y") + timedelta(float(league.duration))),
+            'prize': league.prize1,
+            'players': league.players
+        }
+        for league in leagues
+    ]
+
+    return jsonify(league_board), 200
+
+@app.route("/join_league", methods=['POST'])
+def JoinLeague():
+    data = request.get_json()
+    
+    # Check if the required data is present
+    if not all(key in data for key in ['uid', 'id']):
+        return jsonify({'error': 'Missing data in request'}), 400
+
+    # Fetch the user and league from the database
+    user = User.query.filter_by(id=data["uid"]).first()
+    league = Super_League.query.filter_by(id=data["id"]).first()
+
+    # Check if user and league exist
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    if not league:
+        return jsonify({'error': 'League not found'}), 404
+
+    # Update user and league attributes
+    try:
+        user.super_points = 0
+        league.players.append(data["uid"])
+        db.session.commit()  # Commit changes to the database
+        return jsonify({'message': 'User joined the league successfully'}), 200
+    except Exception as e:
+        db.session.rollback()  # Rollback changes in case of error
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route("/get-three", methods=['GET'])
 def getThree():
@@ -410,6 +494,7 @@ def GetUserAnalytics():
         'percentage' : calculate_percentage(all_points, user.games_played * 10),
         'played' : user.games_played,
         'flag': get_country_flag(user.city)
+        
     })
 
 @app.route('/edit-user', methods=['POST'])
